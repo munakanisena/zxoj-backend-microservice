@@ -1,7 +1,6 @@
 package com.katomegumi.zxojbackendjudgeservice.judge;
 
 import cn.hutool.json.JSONUtil;
-
 import com.katomegumi.common.ErrorCode;
 import com.katomegumi.exception.BusinessException;
 import com.katomegumi.model.codesandbox.ExecuteCodeRequest;
@@ -14,8 +13,7 @@ import com.katomegumi.model.enums.QuestionSubmitStatusEnum;
 import com.katomegumi.zxojbackendjudgeservice.judge.codesandbox.CodeSandbox;
 import com.katomegumi.zxojbackendjudgeservice.judge.codesandbox.CodeSandboxFactory;
 import com.katomegumi.zxojbackendjudgeservice.judge.strategy.JudgeContext;
-import com.katomegumi.zxojbackendserviceclient.service.QuestionService;
-import com.katomegumi.zxojbackendserviceclient.service.QuestionSubmitService;
+import com.katomegumi.zxojbackendserviceclient.service.QuestionFeignClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -33,9 +31,8 @@ import java.util.stream.Collectors;
 public class JudgeServiceImpl implements JudgeService {
 
     @Resource
-    private QuestionService questionService;
-    @Resource
-    private QuestionSubmitService questionSubmitService;
+    private QuestionFeignClient questionFeignClient;
+
 
     @Resource
     private JudgeManager judgeManager;
@@ -49,12 +46,12 @@ public class JudgeServiceImpl implements JudgeService {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"题目Id为空");
         }
         //1 判断 题目是否存在 题目任务是否存在
-        QuestionSubmit questionSubmit = questionSubmitService.getById(questionSubmitId);
+        QuestionSubmit questionSubmit = questionFeignClient.getQuestionSubmitById(questionSubmitId);
         if (questionSubmit == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR,"题目任务不存在");
         }
         Long questionId = questionSubmit.getQuestionId();
-        Question question = questionService.getById(questionId);
+        Question question = questionFeignClient.getQuestionById(questionId);
         if (question == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR,"题目不存在");
         }
@@ -66,7 +63,7 @@ public class JudgeServiceImpl implements JudgeService {
         QuestionSubmit questionSubmitUpdate = new QuestionSubmit();
         questionSubmitUpdate.setId(questionSubmitId);
         questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.RUNNING.getValue());
-        boolean result = questionSubmitService.updateById(questionSubmitUpdate);
+        boolean result = questionFeignClient.updateQuestionSubmitById(questionSubmitUpdate);
         if (!result) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR,"设置失败,请重试");
         }
@@ -105,12 +102,12 @@ public class JudgeServiceImpl implements JudgeService {
         questionSubmitUpdate.setId(questionSubmitId);
         questionSubmitUpdate.setStatus(QuestionSubmitStatusEnum.SUCCEED.getValue());
         questionSubmitUpdate.setJudgeInfo(JSONUtil.toJsonStr(judgeInfo));
-        result = questionSubmitService.updateById(questionSubmitUpdate);
+        result = questionFeignClient.updateQuestionSubmitById(questionSubmitUpdate);
         if (!result) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR,"设置失败,请重试");
         }
         //返回任务
-        QuestionSubmit questionSubmitResult = questionSubmitService.getById(questionSubmitId);
+        QuestionSubmit questionSubmitResult = questionFeignClient.getQuestionSubmitById(questionSubmitId);
         return questionSubmitResult;
     }
 }

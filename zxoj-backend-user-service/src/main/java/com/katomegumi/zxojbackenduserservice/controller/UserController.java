@@ -1,7 +1,6 @@
 package com.katomegumi.zxojbackenduserservice.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 import com.katomegumi.annotation.AuthCheck;
 import com.katomegumi.common.BaseResponse;
 import com.katomegumi.common.DeleteRequest;
@@ -16,7 +15,6 @@ import com.katomegumi.model.vo.LoginUserVO;
 import com.katomegumi.model.vo.UserVO;
 import com.katomegumi.zxojbackenduserservice.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.DigestUtils;
@@ -24,14 +22,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.List;
 
 import static com.sun.javafx.font.FontResource.SALT;
 
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/")
 @Slf4j
 public class UserController {
 

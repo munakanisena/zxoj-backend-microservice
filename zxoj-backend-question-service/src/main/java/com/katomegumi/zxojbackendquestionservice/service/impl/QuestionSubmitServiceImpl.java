@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.katomegumi.common.ErrorCode;
 import com.katomegumi.constant.CommonConstant;
@@ -22,8 +21,8 @@ import com.katomegumi.utils.SqlUtils;
 import com.katomegumi.zxojbackendquestionservice.mapper.QuestionSubmitMapper;
 import com.katomegumi.zxojbackendquestionservice.service.QuestionService;
 import com.katomegumi.zxojbackendquestionservice.service.QuestionSubmitService;
-import com.katomegumi.zxojbackendserviceclient.service.JudgeService;
-import com.katomegumi.zxojbackendserviceclient.service.UserService;
+import com.katomegumi.zxojbackendserviceclient.service.JudgeFeignClient;
+import com.katomegumi.zxojbackendserviceclient.service.UserFeignClient;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -45,11 +44,11 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     private QuestionService questionService;
 
     @Resource
-    private UserService userService;
+    private UserFeignClient userFeignClient;
 
     @Lazy
     @Resource
-    private JudgeService judgeService;
+    private JudgeFeignClient judgeService;
 
     /**
      * 提交题目
@@ -131,7 +130,7 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         // 脱敏：仅本人和管理员能看见自己（提交 userId 和登录用户 id 不同）提交的代码
         long userId = loginUser.getId();
         // 处理脱敏
-        if (userId != questionSubmit.getUserId() && !userService.isAdmin(loginUser)) {
+        if (userId != questionSubmit.getUserId() && !userFeignClient.isAdmin(loginUser)) {
             questionSubmitVO.setCode(null);
         }
         return questionSubmitVO;
