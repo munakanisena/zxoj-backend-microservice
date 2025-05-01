@@ -38,6 +38,8 @@ server:
     session:
       cookie:
         max-age: 2592000
+        #cookie 跨域问题
+        path: /api
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: false
@@ -50,14 +52,6 @@ mybatis-plus:
 # 接口文档配置
 knife4j:
   enable: true
-  openapi:
-    title: "接口文档"
-    version: 1.0
-    group:
-      default:
-        api-rule: package
-        api-rule-resources:
-          - com.katomegumi.zxojbackenduserservice.controller
 # 用户可以自由选择
 codeSandBox:
   type: remote

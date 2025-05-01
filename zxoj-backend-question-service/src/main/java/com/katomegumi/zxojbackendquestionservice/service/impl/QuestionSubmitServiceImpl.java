@@ -19,6 +19,7 @@ import com.katomegumi.model.enums.QuestionSubmitStatusEnum;
 import com.katomegumi.model.vo.QuestionSubmitVO;
 import com.katomegumi.utils.SqlUtils;
 import com.katomegumi.zxojbackendquestionservice.mapper.QuestionSubmitMapper;
+import com.katomegumi.zxojbackendquestionservice.rabbitMq.MyMessageProducer;
 import com.katomegumi.zxojbackendquestionservice.service.QuestionService;
 import com.katomegumi.zxojbackendquestionservice.service.QuestionSubmitService;
 import com.katomegumi.zxojbackendserviceclient.service.JudgeFeignClient;
@@ -48,7 +49,10 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
 
     @Lazy
     @Resource
-    private JudgeFeignClient judgeService;
+    private JudgeFeignClient judgeFeignClient;
+
+    @Resource
+    private MyMessageProducer myMessageProducer;
 
     /**
      * 提交题目
@@ -88,8 +92,9 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         }
         // 执行判题逻辑
         Long questionSubmitId = questionSubmit.getId();
+        myMessageProducer.sendMessage("code_exchange","my_routingKey",questionSubmitId.toString());
         //异步执行
-        CompletableFuture.runAsync(()->judgeService.doJudge(questionSubmitId));
+//        CompletableFuture.runAsync(()->judgeFeignClient.doJudge(questionSubmitId));
         return questionSubmitId;
     }
 

@@ -1,6 +1,7 @@
 package com.katomegumi.zxojbackendjudgeservice;
 
 
+import com.katomegumi.zxojbackendjudgeservice.rabbitMq.InitRabbitMq;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -20,6 +21,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class ZxojBackendJudgeServiceApplication {
 
     public static void main(String[] args) {
+        //启动前 创建队列 交换机
+        InitRabbitMq.doInit();
         SpringApplication.run(ZxojBackendJudgeServiceApplication.class, args);
     }
 
